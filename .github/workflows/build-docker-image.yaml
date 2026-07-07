@@ -28,11 +28,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push Docker Image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/helloworld:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/helloworld:${{ github.sha }}
+      - name: Build prod image
+        run: docker build -f Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/helloworld:latest .
+      
+      - name: Build dev image
+        run: docker build -f Dockerfile.dev -t ${{ secrets.DOCKERHUB_USERNAME }}/helloworld:dev .
+      
+      - name: Push images
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/helloworld:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/helloworld:dev
+
